@@ -1,6 +1,6 @@
 {
-  "domain": "oralb",
-  "name": "OralB",
+  "domain": "oralb-hacs",
+  "name": "OralB-hacs",
   "config_flow": true,
   "documentation": "https://www.home-assistant.io/integrations/oralb",
   "bluetooth": [
@@ -14,5 +14,6 @@
   "homekit": {},
   "dependencies": ["bluetooth"],
   "codeowners": ["@bkbilly"],
-  "iot_class": "local_push"
+  "iot_class": "local_push",
+  "version": "0.0.0"
 }
