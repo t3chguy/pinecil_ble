@@ -1,6 +1,6 @@
 {
-  "domain": "oralb-hacs",
-  "name": "OralB-hacs",
+  "domain": "oralb",
+  "name": "OralB",
   "config_flow": true,
   "documentation": "https://github.com/bkbilly/hass-oralb",
   "issue_tracker": "https://github.com/bkbilly/hass-oralb/issues",
