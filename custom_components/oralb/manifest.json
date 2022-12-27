@@ -1,5 +1,5 @@
 {
-  "domain": "oralb",
+  "domain": "oralb-hacs",
   "name": "OralB-hacs",
   "config_flow": true,
   "documentation": "https://github.com/bkbilly/hass-oralb",
