@@ -13,5 +13,6 @@ from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 class OralBData:
     """Data for the OralB integration."""
 
+    title: str
     device: OralB
     coordinator: DataUpdateCoordinator
