@@ -2,7 +2,8 @@
   "domain": "oralb-hacs",
   "name": "OralB-hacs",
   "config_flow": true,
-  "documentation": "https://www.home-assistant.io/integrations/oralb",
+  "documentation": "https://github.com/bkbilly/hass-oralb",
+  "issue_tracker": "https://github.com/bkbilly/hass-oralb/issues",
   "bluetooth": [
     {
       "service_uuid": "0000181d-0000-1000-8000-00805f9b34fb"
