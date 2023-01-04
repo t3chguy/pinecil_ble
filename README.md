@@ -1,6 +1,6 @@
 
-[![GitHub Release](https://img.shields.io/github/release/bkbilly/hass-oralb.svg?style=flat-square)](https://github.com/bkbilly/hass-oralb/releases)
-[![License](https://img.shields.io/github/license/bkbilly/hass-oralb.svg?style=flat-square)](LICENSE)
+[![GitHub Release](https://img.shields.io/github/release/bkbilly/oralb-hacs.svg?style=flat-square)](https://github.com/bkbilly/oralb-hacs/releases)
+[![License](https://img.shields.io/github/license/bkbilly/oralb-hacs.svg?style=flat-square)](LICENSE)
 [![hacs](https://img.shields.io/badge/HACS-default-orange.svg?style=flat-square)](https://hacs.xyz)
 
 
@@ -19,7 +19,7 @@ Support for Bluetooth toothbrush by OralB which exposes the following sensors:
 
 Easiest install is via [HACS](https://hacs.xyz/):
 
-[![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=bkbilly&repository=hass-oralb&category=integration)
+[![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=bkbilly&repository=oralb-hacs&category=integration)
 
 `HACS -> Explore & Add Repositories -> OralB-hacs`
 
