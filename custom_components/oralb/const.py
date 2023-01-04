@@ -1,5 +1,5 @@
 """Constants for the OralB integration."""
 
-DOMAIN = "oralb-hacs"
+DOMAIN = "oralb_hacs"
 UPDATE_SECONDS = 1
 DEVICE_TIMEOUT = 5
