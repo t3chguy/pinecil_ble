@@ -1,9 +1,9 @@
 {
-  "domain": "oralb_hacs",
-  "name": "OralB_hacs",
+  "domain": "oralb_ble",
+  "name": "OralB BLE",
   "config_flow": true,
-  "documentation": "https://github.com/bkbilly/oralb_hacs",
-  "issue_tracker": "https://github.com/bkbilly/oralb_hacs/issues",
+  "documentation": "https://github.com/bkbilly/oralb_ble",
+  "issue_tracker": "https://github.com/bkbilly/oralb_ble/issues",
   "bluetooth": [
     {
       "service_uuid": "0000181d-0000-1000-8000-00805f9b34fb"
