@@ -1,4 +1,4 @@
-"""Config flow for OralB integration."""
+"""Config flow for Pinecil integration."""
 from __future__ import annotations
 
 import logging
@@ -22,7 +22,7 @@ STEP_USER_DATA_SCHEMA = vol.Schema(
 
 
 class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
-    """Handle a config flow for OralB."""
+    """Handle a config flow for Pinecil."""
 
     VERSION = 1
 
@@ -39,4 +39,4 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             )
 
         if user_input is not None:
-            return self.async_create_entry(title="OralB Toothbrush", data=user_input)
+            return self.async_create_entry(title="Pinecil soldering iron", data=user_input)

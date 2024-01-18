@@ -1,10 +1,17 @@
-# OralB-BLE
-Integrates [OralB](https://oralb.com/en-us/products/shop-all/) Bluetooth Toothbrushes into Home Assistant.
+# Pinecil_BLE
+Integrates [Pinecil V2](https://pine64.com/product/pinecil-smart-mini-portable-soldering-iron/) Soldering Irons into Home Assistant.
 
-It is using an active connection to communicate with the tootbrush in contrary with the [official](https://www.home-assistant.io/integrations/oralb/) which is using a passive connection. This means that it can get more information, but it uses the [limited connections](https://esphome.io/components/bluetooth_proxy.html) that exist on ESPHome.
-
-Support for Bluetooth toothbrush by OralB which exposes the following sensors:
- - Brush Time in seconds
- - Battery Percentage
- - Selected Mode
- - Operation status
+Support for Pinecil v2 soldering iron by Pine64 which exposes the following sensors:
+- Tip temperature
+- Set temperature
+- DC voltage
+- Handle temperature
+- Power (PWM)
+- Tip resistance
+- Uptime
+- Max temperature
+- Raw tip voltage
+- Hall effect strength
+- Estimated watts
+- Power source
+- Operating mode

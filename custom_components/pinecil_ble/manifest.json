@@ -1,0 +1,20 @@
+{
+  "domain": "pinecil_ble",
+  "name": "Pinecil BLE",
+  "config_flow": true,
+  "documentation": "https://github.com/t3chguy/pinecil_ble",
+  "issue_tracker": "https://github.com/t3chguy/pinecil_ble/issues",
+  "bluetooth": [
+    {
+      "service_uuid": "9eae1000-9d0d-48c5-aa55-33e27f9bc533"
+    }
+  ],
+  "requirements": ["pinecil==0.2.10"],
+  "ssdp": [],
+  "zeroconf": [],
+  "homekit": {},
+  "dependencies": ["bluetooth"],
+  "codeowners": ["@t3chguy"],
+  "iot_class": "local_push",
+  "version": "0.0.0"
+}

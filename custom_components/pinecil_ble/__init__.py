@@ -1,4 +1,4 @@
-"""The OralB integration."""
+"""The Pinecil integration."""
 from __future__ import annotations
 
 import asyncio
@@ -6,7 +6,6 @@ from datetime import timedelta
 import logging
 
 import async_timeout
-from oralb import OralB
 
 from homeassistant.components import bluetooth
 from homeassistant.components.bluetooth.match import ADDRESS, BluetoothCallbackMatcher
@@ -17,7 +16,7 @@ from homeassistant.exceptions import ConfigEntryNotReady
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 
 from .const import DEVICE_TIMEOUT, DOMAIN, UPDATE_SECONDS
-from .models import OralBData
+from .models import PinecilWrapper
 
 # For your initial PR, limit it to 1 platform.
 PLATFORMS: list[Platform] = [Platform.SENSOR]
@@ -25,21 +24,33 @@ _LOGGER = logging.getLogger(__name__)
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
-    """Set up OralB from a config entry."""
+    """Set up Pinecil from a config entry."""
     address: str = entry.data[CONF_MAC]
     ble_device = bluetooth.async_ble_device_from_address(hass, address.upper(), True)
     if not ble_device:
-        raise ConfigEntryNotReady(f"Could not find OralB device with address {address}")
+        raise ConfigEntryNotReady(f"Could not find Pinecil device with address {address}")
 
-    orlb = OralB(ble_device)
+    async def _async_update():
+        """Update the device state."""
+        await pinecil.update()
+
+    coordinator = DataUpdateCoordinator(
+        hass,
+        _LOGGER,
+        name=DOMAIN,
+        update_method=_async_update,
+        update_interval=timedelta(seconds=UPDATE_SECONDS),
+    )
+
+    pinecil = PinecilWrapper(entry.title, coordinator)
 
     @callback
     def _async_update_ble(
-        service_info: bluetooth.BluetoothServiceInfoBleak,
-        change: bluetooth.BluetoothChange,
+            service_info: bluetooth.BluetoothServiceInfoBleak,
+            change: bluetooth.BluetoothChange,
     ) -> None:
         """Update from a ble callback."""
-        orlb.set_ble_device(service_info.device)
+        pinecil.set_ble_device(service_info.device)
 
     entry.async_on_unload(
         bluetooth.async_register_callback(
@@ -48,18 +59,6 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
             BluetoothCallbackMatcher({ADDRESS: address}),
             bluetooth.BluetoothScanningMode.PASSIVE,
         )
-    )
-
-    async def _async_update():
-        """Update the device state."""
-        await orlb.gatherdata()
-
-    coordinator = DataUpdateCoordinator(
-        hass,
-        _LOGGER,
-        name=DOMAIN,
-        update_method=_async_update,
-        update_interval=timedelta(seconds=UPDATE_SECONDS),
     )
 
     try:
@@ -71,16 +70,14 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
             f"Try moving the Bluetooth adapter closer to {DOMAIN}"
         ) from ex
 
-    hass.data.setdefault(DOMAIN, {})[entry.entry_id] = OralBData(
-        entry.title, orlb, coordinator
-    )
+    hass.data.setdefault(DOMAIN, {})[entry.entry_id] = pinecil
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
     entry.async_on_unload(entry.add_update_listener(_async_update_listener))
 
     async def _async_stop(event: Event) -> None:
         """Close the connection."""
-        orlb.disconnect()
+        pinecil.disconnect()
 
     entry.async_on_unload(
         hass.bus.async_listen_once(EVENT_HOMEASSISTANT_STOP, _async_stop)
