@@ -31,3 +31,5 @@ Easiest install is via [HACS](https://hacs.xyz/):
 `HACS -> Explore & Add Repositories -> Pinecil_BLE`
 
 HACS does not "configure" the integration for you. You must go to `Configuration > Integrations` and add Pinecil_BLE after installing via HACS.
+
+When adding the integration, enter the Pinecil's BLE MAC in the prompt dialogue.
