@@ -36,7 +36,7 @@ class PinecilSensorEntityDescription(SensorEntityDescription):
 SENSORS = (
     PinecilSensorEntityDescription(
         key="LiveTemp",
-        name="Tip temperature",
+        name="Tip Temperature",
         unique_id="pinecil_live_temp",
         native_unit_of_measurement=UnitOfTemperature.CELSIUS,
         device_class=SensorDeviceClass.TEMPERATURE,
@@ -44,7 +44,7 @@ SENSORS = (
     ),
     PinecilSensorEntityDescription(
         key="SetTemp",
-        name="Set temperature",
+        name="Set Temperature",
         unique_id="pinecil_set_temp",
         native_unit_of_measurement=UnitOfTemperature.CELSIUS,
         device_class=SensorDeviceClass.TEMPERATURE,
@@ -52,7 +52,7 @@ SENSORS = (
     ),
     PinecilSensorEntityDescription(
         key="Voltage",
-        name="DC voltage",
+        name="DC Voltage",
         unique_id="pinecil_voltage",
         native_unit_of_measurement=UnitOfElectricPotential.VOLT,
         device_class=SensorDeviceClass.VOLTAGE,
@@ -60,7 +60,7 @@ SENSORS = (
     ),
     PinecilSensorEntityDescription(
         key="HandleTemp",
-        name="Handle temperature",
+        name="Handle Temperature",
         unique_id="pinecil_handle_temp",
         native_unit_of_measurement=UnitOfTemperature.CELSIUS,
         device_class=SensorDeviceClass.TEMPERATURE,
@@ -85,7 +85,7 @@ SENSORS = (
     ),
     PinecilSensorEntityDescription(
         key="TipResistance",
-        name="Tip resistance",
+        name="Tip Resistance",
         unique_id="pinecil_tip_resistance",
         native_unit_of_measurement="Ω",
         device_class=SensorDeviceClass.POWER,
@@ -102,7 +102,7 @@ SENSORS = (
     ),
     PinecilSensorEntityDescription(
         key="MovementTime",
-        name="Last movement time",
+        name="Last Movement Time",
         unique_id="pinecil_movemenet_time",
         native_unit_of_measurement=UnitOfTime.MILLISECONDS,
         device_class=SensorDeviceClass.DURATION,
@@ -110,7 +110,7 @@ SENSORS = (
     ),
     PinecilSensorEntityDescription(
         key="MaxTipTempAbility",
-        name="Max temperature",
+        name="Max Temperature",
         unique_id="pinecil_max_tip_temp_ability",
         native_unit_of_measurement=UnitOfTemperature.CELSIUS,
         device_class=SensorDeviceClass.TEMPERATURE,
@@ -119,7 +119,7 @@ SENSORS = (
     ),
     PinecilSensorEntityDescription(
         key="VoltsTip",
-        name="Raw tip voltage",
+        name="Raw Tip Voltage",
         unique_id="pinecil_u_volts_tip",
         native_unit_of_measurement=UnitOfElectricPotential.MILLIVOLT,
         device_class=SensorDeviceClass.VOLTAGE,
@@ -127,7 +127,7 @@ SENSORS = (
     ),
     PinecilSensorEntityDescription(
         key="HallSensor",
-        name="Hall effect strength",
+        name="Hall Effect Strength",
         unique_id="pinecil_hall_sensor",
         state_class=SensorStateClass.MEASUREMENT,
     ),
