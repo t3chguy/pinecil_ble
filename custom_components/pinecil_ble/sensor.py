@@ -14,7 +14,6 @@ from homeassistant.components.sensor import (
 )
 from homeassistant.const import PERCENTAGE, UnitOfTemperature, UnitOfElectricPotential, UnitOfTime, UnitOfPower
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers.device_registry import DeviceEntryType
 from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
@@ -172,7 +171,6 @@ class PinecilSensor(CoordinatorEntity, SensorEntity):
         self.pinecil = pinecil
 
         self._attr_device_info = DeviceInfo(
-            entry_type=DeviceEntryType.SERVICE,
             identifiers={(DOMAIN, self.pinecil.ble_device.address)},
             manufacturer="Pine64",
             name="Pinecil v2",
