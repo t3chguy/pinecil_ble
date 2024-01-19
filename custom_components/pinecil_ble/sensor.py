@@ -72,7 +72,7 @@ SENSORS = (
         unique_id="pinecil_pwm_level",
         native_unit_of_measurement=PERCENTAGE,
         suggested_display_precision=2,
-        device_class=SensorDeviceClass.POWER,
+        device_class=SensorDeviceClass.POWER_FACTOR,
         state_class=SensorStateClass.MEASUREMENT,
     ),
     PinecilSensorEntityDescription(
@@ -80,14 +80,12 @@ SENSORS = (
         name="Power Source",
         unique_id="pinecil_power_source",
         device_class=SensorDeviceClass.ENUM,
-        state_class=SensorStateClass.MEASUREMENT,
     ),
     PinecilSensorEntityDescription(
         key="TipResistance",
         name="Tip resistance",
         unique_id="pinecil_tip_resistance",
         native_unit_of_measurement="Ω",
-        device_class=SensorDeviceClass.POWER,
         state_class=SensorStateClass.MEASUREMENT,
     ),
     PinecilSensorEntityDescription(
@@ -133,7 +131,6 @@ SENSORS = (
         name="Operating Mode",
         unique_id="pinecil_operating_mode",
         device_class=SensorDeviceClass.ENUM,
-        state_class=SensorStateClass.MEASUREMENT,
     ),
     PinecilSensorEntityDescription(
         key="Watts",
