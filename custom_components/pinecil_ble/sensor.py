@@ -81,6 +81,7 @@ SENSORS = (
         unique_id="pinecil_power_source",
         device_class=SensorDeviceClass.ENUM,
         state_class=SensorStateClass.MEASUREMENT,
+        icon="mdi:power-plug",
     ),
     PinecilSensorEntityDescription(
         key="TipResistance",
@@ -89,6 +90,7 @@ SENSORS = (
         native_unit_of_measurement="Ω",
         device_class=SensorDeviceClass.POWER,
         state_class=SensorStateClass.MEASUREMENT,
+        icon="mdi:omega",
     ),
     PinecilSensorEntityDescription(
         key="Uptime",
@@ -113,6 +115,7 @@ SENSORS = (
         native_unit_of_measurement=UnitOfTemperature.CELSIUS,
         device_class=SensorDeviceClass.TEMPERATURE,
         state_class=SensorStateClass.MEASUREMENT,
+        icon="mdi:thermometer-alert",
     ),
     PinecilSensorEntityDescription(
         key="VoltsTip",
