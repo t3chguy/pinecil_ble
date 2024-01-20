@@ -164,7 +164,7 @@ class PinecilSensor(CoordinatorEntity, SensorEntity):
 
     _attr_has_entity_name = True
 
-    def __init__(self, pinecil: PinecilWrapper, description):
+    def __init__(self, pinecil: PinecilWrapper, description: PinecilSensorEntityDescription):
         """Initialize the sensor."""
         super().__init__(pinecil.coordinator)
         self.entity_description = description
