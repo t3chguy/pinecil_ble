@@ -33,7 +33,7 @@ class PinecilSensorEntityDescription(SensorEntityDescription):
     unique_id: str | None = None
 
 
-SENSORS = (
+ENTITIES = (
     PinecilSensorEntityDescription(
         key="LiveTemp",
         name="Tip Temperature",
@@ -155,7 +155,7 @@ async def async_setup_entry(
     data: PinecilWrapper = hass.data[DOMAIN][entry.entry_id]
     async_add_entities(
         PinecilSensor(data, description)
-        for description in SENSORS
+        for description in ENTITIES
     )
 
 
