@@ -138,7 +138,7 @@ SENSORS = (
     PinecilSensorEntityDescription(
         key="Watts",
         name="Power",
-        unique_id="pinecil_hall_sensor",
+        unique_id="pinecil_power_estimate",
         native_unit_of_measurement=UnitOfPower.WATT,
         device_class=SensorDeviceClass.POWER,
         state_class=SensorStateClass.MEASUREMENT,
