@@ -43,14 +43,6 @@ ENTITIES = (
         state_class=SensorStateClass.MEASUREMENT,
     ),
     PinecilSensorEntityDescription(
-        key="SetTemp",
-        name="Set Temperature",
-        unique_id="pinecil_set_temp",
-        native_unit_of_measurement=UnitOfTemperature.CELSIUS,
-        device_class=SensorDeviceClass.TEMPERATURE,
-        state_class=SensorStateClass.MEASUREMENT,
-    ),
-    PinecilSensorEntityDescription(
         key="Voltage",
         name="DC Voltage",
         unique_id="pinecil_voltage",

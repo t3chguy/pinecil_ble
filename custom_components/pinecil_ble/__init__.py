@@ -18,8 +18,7 @@ from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 from .const import DEVICE_TIMEOUT, DOMAIN, UPDATE_SECONDS
 from .models import PinecilWrapper
 
-# For your initial PR, limit it to 1 platform.
-PLATFORMS: list[Platform] = [Platform.SENSOR]
+PLATFORMS: list[Platform] = [Platform.SENSOR, Platform.NUMBER]
 _LOGGER = logging.getLogger(__name__)
 
 
