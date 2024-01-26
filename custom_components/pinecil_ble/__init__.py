@@ -1,21 +1,22 @@
 """The Pinecil integration."""
 from __future__ import annotations
 
-import asyncio
-from datetime import timedelta
 import logging
 
-import async_timeout
-
+from bleak_retry_connector import close_stale_connections_by_address
 from homeassistant.components import bluetooth
-from homeassistant.components.bluetooth.match import ADDRESS, BluetoothCallbackMatcher
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import CONF_MAC, EVENT_HOMEASSISTANT_STOP, Platform
-from homeassistant.core import Event, HomeAssistant, callback
+from homeassistant.const import (
+    CONF_ADDRESS,
+    CONF_MAC,
+    Platform,
+)
+from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryNotReady
-from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
+from homeassistant.helpers import device_registry as dr
 
-from .const import DEVICE_TIMEOUT, DOMAIN, UPDATE_SECONDS
+from .const import DOMAIN
+from .coordinator import PinecilDataUpdateCoordinator
 from .models import PinecilWrapper
 
 PLATFORMS: list[Platform] = [Platform.SENSOR, Platform.NUMBER]
@@ -23,75 +24,62 @@ _LOGGER = logging.getLogger(__name__)
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
-    """Set up Pinecil from a config entry."""
-    address: str = entry.data[CONF_MAC]
+    """Set up pinecil from a config entry."""
+    assert entry.unique_id is not None
+    hass.data.setdefault(DOMAIN, {})
+    if CONF_ADDRESS not in entry.data and CONF_MAC in entry.data:
+        # Bleak uses addresses not mac addresses which are actually
+        # UUIDs on some platforms (MacOS).
+        mac = entry.data[CONF_MAC]
+        if "-" not in mac:
+            mac = dr.format_mac(mac)
+        hass.config_entries.async_update_entry(
+            entry,
+            data={**entry.data, CONF_ADDRESS: mac},
+        )
+
+    address: str = entry.data[CONF_ADDRESS]
+
+    await close_stale_connections_by_address(address)
+
     ble_device = bluetooth.async_ble_device_from_address(hass, address.upper(), True)
     if not ble_device:
-        raise ConfigEntryNotReady(f"Could not find Pinecil device with address {address}")
+        raise ConfigEntryNotReady(f"Could not find Pinecil with address {address}")
 
-    async def _async_update():
-        """Update the device state."""
-        await pinecil.update()
+    device = PinecilWrapper(address, ble_device)
 
-    coordinator = DataUpdateCoordinator(
+    coordinator = hass.data[DOMAIN][entry.entry_id] = PinecilDataUpdateCoordinator(
         hass,
         _LOGGER,
-        name=DOMAIN,
-        update_method=_async_update,
-        update_interval=timedelta(seconds=UPDATE_SECONDS),
+        ble_device,
+        device,
+        entry.title,
+        entry.unique_id,
+        True,
+        "Pinecil v2",
     )
-
-    pinecil = PinecilWrapper(entry.title, coordinator)
-
-    @callback
-    def _async_update_ble(
-            service_info: bluetooth.BluetoothServiceInfoBleak,
-            change: bluetooth.BluetoothChange,
-    ) -> None:
-        """Update from a ble callback."""
-        pinecil.set_ble_device(service_info.device)
-
-    entry.async_on_unload(
-        bluetooth.async_register_callback(
-            hass,
-            _async_update_ble,
-            BluetoothCallbackMatcher({ADDRESS: address}),
-            bluetooth.BluetoothScanningMode.PASSIVE,
-        )
-    )
-
-    try:
-        async with async_timeout.timeout(DEVICE_TIMEOUT):
-            await coordinator.async_config_entry_first_refresh()
-    except asyncio.TimeoutError as ex:
-        raise ConfigEntryNotReady(
-            "Unable to communicate with the device; "
-            f"Try moving the Bluetooth adapter closer to {DOMAIN}"
-        ) from ex
-
-    hass.data.setdefault(DOMAIN, {})[entry.entry_id] = pinecil
+    entry.async_on_unload(coordinator.async_start())
+    if not await coordinator.async_wait_ready():
+        raise ConfigEntryNotReady(f"{address} is not advertising state")
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
     entry.async_on_unload(entry.add_update_listener(_async_update_listener))
 
-    async def _async_stop(event: Event) -> None:
-        """Close the connection."""
-        pinecil.disconnect()
-
-    entry.async_on_unload(
-        hass.bus.async_listen_once(EVENT_HOMEASSISTANT_STOP, _async_stop)
-    )
     return True
 
 
 async def _async_update_listener(hass: HomeAssistant, entry: ConfigEntry) -> None:
     """Handle options update."""
-    data = hass.data[DOMAIN][entry.entry_id]
-    data.device.gatherdata()
+    await hass.config_entries.async_reload(entry.entry_id)
 
 
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Unload a config entry."""
-    data = hass.data[DOMAIN][entry.entry_id]
-    data.device.disconnect()
-    return True
+    unload_ok = await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
+
+    if unload_ok:
+        hass.data[DOMAIN].pop(entry.entry_id)
+        if not hass.config_entries.async_entries(DOMAIN):
+            hass.data.pop(DOMAIN)
+
+    return unload_ok

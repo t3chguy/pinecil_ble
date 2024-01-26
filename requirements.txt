@@ -1,1 +1,2 @@
 pinecil==0.2.10
+bleak-retry-connector>=3.4.0

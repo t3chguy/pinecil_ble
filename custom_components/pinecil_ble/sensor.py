@@ -1,136 +1,114 @@
 """Platform for sensor integration."""
 from __future__ import annotations
 
-from dataclasses import dataclass
-from datetime import timedelta
 import logging
+from datetime import timedelta
 
 from homeassistant import config_entries
+from homeassistant.components.bluetooth import async_last_service_info
 from homeassistant.components.sensor import (
     SensorDeviceClass,
     SensorEntity,
     SensorEntityDescription,
     SensorStateClass,
 )
-from homeassistant.const import PERCENTAGE, UnitOfTemperature, UnitOfElectricPotential, UnitOfTime, UnitOfPower
+from homeassistant.const import PERCENTAGE, UnitOfTemperature, UnitOfElectricPotential, UnitOfTime, UnitOfPower, \
+    SIGNAL_STRENGTH_DECIBELS_MILLIWATT, EntityCategory
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
-from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
-from . import PinecilWrapper
 from .const import DOMAIN
+from .coordinator import PinecilDataUpdateCoordinator
+from .entity import PinecilEntity
 
 _LOGGER = logging.getLogger(__name__)
 SCAN_INTERVAL = timedelta(seconds=1)
 
-
-@dataclass
-class PinecilSensorEntityDescription(SensorEntityDescription):
-    """Provide a description of a Pinecil sensor."""
-
-    # For backwards compat, allow description to override unique ID key to use
-    unique_id: str | None = None
-
-
 ENTITIES = (
-    PinecilSensorEntityDescription(
+    SensorEntityDescription(
         key="LiveTemp",
         name="Tip Temperature",
-        unique_id="pinecil_live_temp",
         native_unit_of_measurement=UnitOfTemperature.CELSIUS,
         device_class=SensorDeviceClass.TEMPERATURE,
         state_class=SensorStateClass.MEASUREMENT,
     ),
-    PinecilSensorEntityDescription(
+    SensorEntityDescription(
         key="Voltage",
         name="DC Voltage",
-        unique_id="pinecil_voltage",
         native_unit_of_measurement=UnitOfElectricPotential.VOLT,
         device_class=SensorDeviceClass.VOLTAGE,
         state_class=SensorStateClass.MEASUREMENT,
     ),
-    PinecilSensorEntityDescription(
+    SensorEntityDescription(
         key="HandleTemp",
         name="Handle Temperature",
-        unique_id="pinecil_handle_temp",
         native_unit_of_measurement=UnitOfTemperature.CELSIUS,
         device_class=SensorDeviceClass.TEMPERATURE,
         state_class=SensorStateClass.MEASUREMENT,
     ),
-    PinecilSensorEntityDescription(
+    SensorEntityDescription(
         key="PWMLevel",
         name="Power PWM",
-        unique_id="pinecil_pwm_level",
         native_unit_of_measurement=PERCENTAGE,
         suggested_display_precision=2,
         device_class=SensorDeviceClass.POWER_FACTOR,
         state_class=SensorStateClass.MEASUREMENT,
     ),
-    PinecilSensorEntityDescription(
+    SensorEntityDescription(
         key="PowerSource",
         name="Power Source",
-        unique_id="pinecil_power_source",
         device_class=SensorDeviceClass.ENUM,
         icon="mdi:power-plug",
     ),
-    PinecilSensorEntityDescription(
+    SensorEntityDescription(
         key="TipResistance",
         name="Tip Resistance",
-        unique_id="pinecil_tip_resistance",
         native_unit_of_measurement="Ω",
         state_class=SensorStateClass.MEASUREMENT,
         icon="mdi:omega",
     ),
-    PinecilSensorEntityDescription(
+    SensorEntityDescription(
         key="Uptime",
         name="Uptime",
-        unique_id="pinecil_uptime",
         native_unit_of_measurement=UnitOfTime.SECONDS,
         device_class=SensorDeviceClass.DURATION,
         state_class=SensorStateClass.MEASUREMENT,
     ),
-    PinecilSensorEntityDescription(
+    SensorEntityDescription(
         key="MovementTime",
         name="Last Movement Time",
-        unique_id="pinecil_movemenet_time",
         native_unit_of_measurement=UnitOfTime.MILLISECONDS,
         device_class=SensorDeviceClass.DURATION,
         state_class=SensorStateClass.MEASUREMENT,
     ),
-    PinecilSensorEntityDescription(
+    SensorEntityDescription(
         key="MaxTipTempAbility",
         name="Max Temperature",
-        unique_id="pinecil_max_tip_temp_ability",
         native_unit_of_measurement=UnitOfTemperature.CELSIUS,
         device_class=SensorDeviceClass.TEMPERATURE,
         state_class=SensorStateClass.MEASUREMENT,
         icon="mdi:thermometer-alert",
     ),
-    PinecilSensorEntityDescription(
+    SensorEntityDescription(
         key="VoltsTip",
         name="Raw Tip Voltage",
-        unique_id="pinecil_u_volts_tip",
         native_unit_of_measurement=UnitOfElectricPotential.MILLIVOLT,
         device_class=SensorDeviceClass.VOLTAGE,
         state_class=SensorStateClass.MEASUREMENT,
     ),
-    PinecilSensorEntityDescription(
+    SensorEntityDescription(
         key="HallSensor",
         name="Hall Effect Strength",
-        unique_id="pinecil_hall_sensor",
         state_class=SensorStateClass.MEASUREMENT,
     ),
-    PinecilSensorEntityDescription(
+    SensorEntityDescription(
         key="OperatingMode",
         name="Operating Mode",
-        unique_id="pinecil_operating_mode",
         device_class=SensorDeviceClass.ENUM,
     ),
-    PinecilSensorEntityDescription(
+    SensorEntityDescription(
         key="Watts",
         name="Power",
-        unique_id="pinecil_power_estimate",
         native_unit_of_measurement=UnitOfPower.WATT,
         device_class=SensorDeviceClass.POWER,
         state_class=SensorStateClass.MEASUREMENT,
@@ -139,41 +117,55 @@ ENTITIES = (
 
 
 async def async_setup_entry(
-    hass: HomeAssistant,
-    entry: config_entries.ConfigEntry,
-    async_add_entities: AddEntitiesCallback,
+        hass: HomeAssistant,
+        entry: config_entries.ConfigEntry,
+        async_add_entities: AddEntitiesCallback,
 ) -> None:
     """Set up the sensor platform."""
-    data: PinecilWrapper = hass.data[DOMAIN][entry.entry_id]
-    async_add_entities(
-        PinecilSensor(data, description)
+    coordinator: PinecilDataUpdateCoordinator = hass.data[DOMAIN][entry.entry_id]
+    entities = [
+        PinecilSensor(coordinator, description)
         for description in ENTITIES
-    )
+    ]
+    entities.append(PinecilRSSISensor(coordinator, SensorEntityDescription(
+        key="rssi",
+        translation_key="bluetooth_signal",
+        native_unit_of_measurement=SIGNAL_STRENGTH_DECIBELS_MILLIWATT,
+        device_class=SensorDeviceClass.SIGNAL_STRENGTH,
+        state_class=SensorStateClass.MEASUREMENT,
+        entity_registry_enabled_default=False,
+        entity_category=EntityCategory.DIAGNOSTIC,
+    )))
+    async_add_entities(entities)
 
 
-class PinecilSensor(CoordinatorEntity, SensorEntity):
+class PinecilSensor(PinecilEntity, SensorEntity):
     """Implementation of the Pinecil sensor."""
 
-    _attr_has_entity_name = True
-
-    def __init__(self, pinecil: PinecilWrapper, description: PinecilSensorEntityDescription):
+    def __init__(
+            self,
+            coordinator: PinecilDataUpdateCoordinator,
+            description: SensorEntityDescription,
+    ):
         """Initialize the sensor."""
-        super().__init__(pinecil.coordinator)
+        super().__init__(coordinator)
         self.entity_description = description
-        self.pinecil = pinecil
-
-        self._attr_device_info = DeviceInfo(
-            identifiers={(DOMAIN, self.pinecil.ble_device.address)},
-            manufacturer="Pine64",
-            name="Pinecil v2",
-        )
-
-        self._attr_unique_id = (
-            f"{self.pinecil.ble_device.address}_{description.unique_id}"
-        )
+        self._attr_unique_id = f"{coordinator.base_unique_id}-{description.key}"
 
     @property
     def native_value(self) -> float | None:
         """Return sensor state."""
-        value = self.pinecil.result[self.entity_description.key]
+        value = self.device.live_info.get(self.entity_description.key, None)  # type: ignore
         return value
+
+
+class PinecilRSSISensor(PinecilSensor):
+    """Representation of an RSSI sensor."""
+
+    @property
+    def native_value(self) -> str | int | None:
+        """Return the state of the sensor."""
+        return self.device.rssi
+        if service_info := async_last_service_info(self.hass, self._address, self.coordinator.connectable):
+            return service_info.rssi
+        return None
